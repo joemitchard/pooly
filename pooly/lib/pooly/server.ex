@@ -15,15 +15,15 @@ defmodule Pooly.Server do
 
   # These functions call the requested pool from a dynamically created atom name
   def status(pool_name) do
-    GenServer.call(server_name_from_name(pool_name), :status)
+    Pooly.PoolServer.status(pool_name)
   end
 
-  def checkout(pool_name) do
-    GenServer.call(server_name_from_name(pool_name), :checkout)
+  def checkout(pool_name, block, timeout) do
+    Pooly.PoolServer.checkout(pool_name, block, timeout)
   end
 
   def checkin(pool_name, worker_pid) do
-    GenServer.cast(server_name_from_name(pool_name), {:checkin, worker_pid})
+    Pooly.PoolServer.checkin(pool_name, worker_pid)
   end
 
   # Callbacks
@@ -54,10 +54,6 @@ defmodule Pooly.Server do
   defp supervisor_spec(pool_config) do
     opts = [id: :"#{pool_config[:name]}Supervisor"]
     supervisor(Pooly.PoolSupervisor, [pool_config], opts)
-  end
-  
-  defp server_name_from_name(pool_name) do
-    :"#{pool_name}Server"
   end
 
 end
